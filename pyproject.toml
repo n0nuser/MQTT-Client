@@ -1,0 +1,61 @@
+[tool.poetry]
+authors = ["Pablo González Rubio <gonzrubio.pablo@gmail.com>"]
+description = "MQTT client for Python"
+name = "src"
+version = "0.1.0"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "3.10.*"
+paho-mqtt = "^2.0.0"
+colorama = "^0.4.6"
+pydantic = "^2.7.0"
+pydantic-settings = "^2.2.1"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.3.4"
+pylance = "^0.10.5"
+flake8 = "^7.0.0"
+pylint = "^3.1.0"
+pytest = "^8.1.1"
+pre-commit = "^3.6.2"
+poetry-plugin-export = "^1.7.1"
+types-colorama = "^0.4.15.20240311"
+
+[tool.ruff]
+lint.select = ["ALL"]
+lint.ignore = [
+    "BLE001",
+    "COM812",
+    "ISC001",
+    "D100",
+    "D104",
+    "D105",
+    "D107",
+    "D205",
+    "D211",
+    "D212",
+    "E203",
+    "E266",
+    "ANN101",
+    "ANN102",
+    "ANN204",
+    "S602",
+    "ERA001",
+    "PLR0913",
+]
+target-version = "py310"
+line-length = 100
+
+[tool.flake8]
+max-line-length = 100
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.black]
+line-length = 100
+
+[build-system]
+build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core>=1.0.0"]
