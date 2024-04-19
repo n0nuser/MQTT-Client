@@ -11,12 +11,11 @@ Note: Replace 'path/to/your/config.json' with the actual path to your JSON file.
 """
 
 import json
+import logging
 from pathlib import Path
 
 from pydantic import Field, ValidationError
 from pydantic_settings import BaseSettings
-
-from src.core.logger import log_handler
 
 
 class ServerConnection(BaseSettings):
@@ -42,8 +41,8 @@ class ServerConnection(BaseSettings):
 
     host: str = Field(..., description="The server's hostname or IP address.")
     port: int = Field(..., description="The port on which the server is running.")
-    username: str = Field(..., description="Username for server authentication.")
-    password: str = Field(..., description="Password for server authentication.")
+    username: str | None = Field(None, description="Username for server authentication.")
+    password: str | None = Field(None, description="Password for server authentication.")
     keep_alive: int = Field(..., description="Interval in seconds to keep the connection alive.")
 
 
@@ -107,10 +106,10 @@ class Config(BaseSettings):
 
     server_connection: ServerConnection = Field(..., description="Server connection details.")
     topics: list[Topic] = Field(..., description="List of topics to subscribe or publish.")
-    db: Database = Field(..., description="Database connection details.")
+    db: Database | None = Field(None, description="Database connection details.")
 
 
-def read_config_from_json(path: Path) -> tuple[ServerConnection, list[Topic], Database] | None:
+def read_config_from_json(path: Path, logger: logging.Logger) -> Config | None:
     """
     Reads configuration from a JSON file and validates it against the defined Pydantic models.
 
@@ -129,12 +128,12 @@ def read_config_from_json(path: Path) -> tuple[ServerConnection, list[Topic], Da
     try:
         with path.open("r", encoding="utf-8") as file:
             data = json.load(file)
-        config = Config.parse_obj(data)
+        config = Config.model_validate(data)
     except FileNotFoundError:
-        log_handler.error(f"Error: The file {path} was not found.")
-    except ValidationError as e:
-        log_handler.error(f"Validation Error: {e}")
+        logger.exception("Error: The file %s was not found.", path)
+    except ValidationError:
+        logger.exception("Validation Error.")
     except json.JSONDecodeError:
-        log_handler.error("Error: The file contains invalid JSON.")
+        logger.exception("Error: The file contains invalid JSON.")
     else:
-        return (config.server_connection, config.topics, config.db)
+        return config

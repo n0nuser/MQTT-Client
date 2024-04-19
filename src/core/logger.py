@@ -114,8 +114,6 @@ def cleanup_temp_log_dir(temp_dir: Path) -> None:
         )
 
 
-log_handler = setup_logging()
-
 if __name__ == "__main__":
     setup_logging()
     logging.debug("This is a debug message.")
